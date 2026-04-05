@@ -1,35 +1,40 @@
 # Battle System Implementation Progress
 
-## Status: IN PROGRESS - Iteration 1
+## Status: IN PROGRESS - Iteration 2
 
 ## Completed Items
 - ✅ Created C# project structure (src/BattleSystem.csproj)
 - ✅ Created Models directory
 - ✅ Implemented Zone.cs model with validation
 - ✅ Implemented Mana.cs model with age tracking
-- ✅ Implemented Status.cs model with all status types
+- ✅ Implemented Status.cs model with all status types including weakness(color)
+- ✅ Implemented Condition.cs with all condition types
+- ✅ Implemented Effect.cs with all effect types and validation
+- ✅ Implemented ManaCost.cs with CostEntry
+- ✅ Implemented ManaRequirement.cs with RequirementEntry
+- ✅ Implemented Power.cs with mana cost/requirement support
+- ✅ Implemented Card.cs with full validation (zones, powers, ABILITY_DAMAGE limit)
 
 ## Current Task
-- Implementing Power.cs and related classes (Condition, Effect, ManaCost, ManaRequirement)
+- Implementing Player.cs model with mana management methods
 
 ## Blockers
 - None
 
 ## Next Steps
-1. Implement Power.cs, Condition.cs, Effect.cs, ManaCost.cs, ManaRequirement.cs
-2. Implement Card.cs model
-3. Implement Player.cs model with mana management
-4. Implement Battle.cs resolution logic
-5. Create test project with xUnit
-6. Implement all unit tests from battle-spec.md
-7. Verify all tests pass
+1. Complete Player.cs with mana spending/checking logic
+2. Implement Battle.cs resolution logic (8 steps)
+3. Create test project with xUnit
+4. Implement all unit tests from battle-spec.md
+5. Verify all tests pass
 
 ## Test Results
 - No tests run yet (test project not created)
 
 ## Notes
-- Using .NET 10.0.201
-- Following C# naming conventions and best practices
-- All models have proper validation
-- Status includes weakness(color) support
-- Mana tracks receivedAt for age-based spending
+- All core models implemented with proper validation
+- Card validates exactly 4 zones (one per color)
+- Card validates at least one power and max one ABILITY_DAMAGE
+- Power system supports conditions, effects, mana costs, and requirements
+- Status includes weakness(color) support with color tracking
+- Ready to implement Player with mana management next
