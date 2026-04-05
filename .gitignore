@@ -1,0 +1,42 @@
+# Ralph Wiggum Loop artifacts
+ralph-wiggum.log
+iteration_prompt.txt
+
+# .NET / C# build artifacts
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.user
+*.suo
+*.cache
+*.vs/
+.vscode/
+*.swp
+*~
+
+# NuGet packages
+*.nupkg
+packages/
+.nuget/
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+
+# IDE files
+.idea/
+*.sln.DotSettings.user
+*.csproj.user
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.log
