@@ -1,37 +1,46 @@
 # Battle System Implementation Progress
 
-## Status: IN PROGRESS - Iteration 6
+## Status: IN PROGRESS - Iteration 7
 
 ## Completed Items
 - ✅ All 12 core models implemented
-- ✅ Complete Battle.cs with all 8 resolution steps (467 lines)
-- ✅ Test project created and configured
-- ✅ Fixed test project structure (excluded Tests from main project)
-- ✅ Zone tests implemented and PASSING (5/5 tests)
+- ✅ Complete Battle.cs with all 8 resolution steps
+- ✅ Test project configured and working
+- ✅ Zone tests: 5/5 passing
+- ✅ Mana tests: 11/11 passing
 
 ## Test Results
-**Total: 6 tests passing**
-- ✅ ZONE-001: InitializesWithCorrectColorAndState
-- ✅ ZONE-002: InitializesWithDefendState
-- ✅ ZONE-003: InitializesWithEmptyState
-- ✅ ZONE-004: RejectsInvalidColor
-- ✅ ZONE-005: RejectsInvalidState
-- ✅ UnitTest1: Test1 (default test)
+**Total: 17 tests passing (100%)**
+
+### Zone Tests (5/5) ✅
+- ZONE-001 through ZONE-005: All passing
+
+### Mana Tests (11/11) ✅
+- MANA-001: PlayerStartsWith10EmptyManaSlots
+- MANA-002: AddingManaToEmptyPool
+- MANA-003: AddingManaWhenPoolIsFullRemovesOldest
+- MANA-004: ColorlessCardGeneratesNoMana
+- MANA-005: SpendingColoredManaConsumesOldestOfThatColor
+- MANA-006: SpendingAnyManaConsumesOldestOverall
+- MANA-007: SpendingMoreManaThanAvailableFails
+- MANA-008: ManaRequirementCheckPassesWhenManaIsPresent
+- MANA-009: ManaRequirementCheckFailsWhenManaIsInsufficient
+- MANA-010: ManaRequirementCheckForAnyPassesWithMixedColors
+- MANA-011: ManaPersistsBetweenBattles
 
 ## Current Task
-- Implementing remaining test suites
+- Implementing Status tests (22 tests)
 
 ## Blockers
-- None - tests are running successfully!
+- None
 
 ## Next Steps
-1. Implement Mana tests (11 tests)
-2. Implement Status tests (22 tests)
-3. Implement Battle tests (GHIT, DMG, PWR, BATTLE series - 50+ tests)
-4. Verify all tests pass
+1. Implement Status tests (22 tests)
+2. Implement Battle tests (GHIT, DMG, PWR, BATTLE series)
+3. Verify comprehensive test coverage
 
 ## Notes
-- Test infrastructure working perfectly
-- All Zone model tests passing
-- Ready to implement comprehensive test coverage
-- Battle system is functionally complete and testable
+- Test execution time: 17ms (very fast!)
+- All mana management logic verified
+- Oldest-first spending working correctly
+- Ready for Status tests next
