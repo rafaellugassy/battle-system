@@ -115,6 +115,17 @@ EOF
         echo -e "${GREEN}✓ Changes detected${NC}"
         git add -A
         git commit -m "Ralph Wiggum Loop - Iteration $iter" || true
+        
+        # Auto-push to GitHub
+        if git remote get-url origin &> /dev/null; then
+            echo -e "${YELLOW}Pushing to GitHub...${NC}"
+            if git push origin main 2>&1 | tee -a "$LOG_FILE"; then
+                echo -e "${GREEN}✓ Successfully pushed to GitHub${NC}"
+            else
+                echo -e "${RED}⚠ Push failed - continuing anyway${NC}"
+                echo "Push failure at iteration $iter" >> "$LOG_FILE"
+            fi
+        fi
     fi
     
     echo "Iteration $iter completed at $(date)" >> "$LOG_FILE"
