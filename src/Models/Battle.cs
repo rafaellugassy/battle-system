@@ -184,12 +184,12 @@ public class Battle
     /// <summary>
     /// Applies damage modifiers (weaken, protect, vulnerable, weakness).
     /// </summary>
-    private int ApplyDamageModifiers(int baseDamage, Player attacker, Player defender)
+    private int ApplyDamageModifiers(int baseDamage, Player attacker, Player defender, bool applyWeaken = true)
     {
         var multiplier = 1.0;
 
-        // Weaken on attacker (x0.5)
-        if (attacker.HasStatus("weaken"))
+        // Weaken on attacker (x0.5) - only applies to strength/ability damage, not additional damage
+        if (applyWeaken && attacker.HasStatus("weaken"))
         {
             multiplier *= 0.5;
         }
@@ -351,7 +351,8 @@ public class Battle
             case EffectType.ADDITIONAL_DAMAGE:
                 if (!target.IsEliminated && effect.Value.HasValue)
                 {
-                    var damage = ApplyDamageModifiers(effect.Value.Value, source, target);
+                    // Additional damage does not get weaken modifier
+                    var damage = ApplyDamageModifiers(effect.Value.Value, source, target, applyWeaken: false);
                     target.TakeDamage(damage);
                 }
                 break;

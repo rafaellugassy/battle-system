@@ -1,6 +1,6 @@
 # Battle System Implementation Progress
 
-## Status: IN PROGRESS - Iteration 9
+## Status: IN PROGRESS - Iteration 10
 
 ## Completed Items
 - ✅ All 12 core models implemented
@@ -10,9 +10,10 @@
 - ✅ Mana tests: 11/11 passing
 - ✅ Status tests: 22/22 passing
 - ✅ Greatest Hit tests: 8/8 passing
+- ✅ Damage Calculation tests: 21/21 passing
 
 ## Test Results
-**Total: 47 tests passing (100%)**
+**Total: 68 tests passing (100%)**
 
 ### Zone Tests (5/5) ✅
 - ZONE-001 through ZONE-005: All passing
@@ -25,24 +26,29 @@
 
 ### Greatest Hit Tests (8/8) ✅
 - GHIT-001 through GHIT-008: All passing
-- Single attack scenarios verified
-- Multiple attack scenarios verified
-- Best result selection working correctly
-- Multiple empty hits count as one hit verified
+
+### Damage Calculation Tests (21/21) ✅
+- DMG-001 through DMG-021: All passing
+- Full/half damage on HIT_EMPTY/HIT_ATTACK verified
+- Weaken/Protect/Vulnerable modifiers verified
+- Ability damage replacement verified
+- Additional damage (no weaken) verified
+- Weakness(color) matching verified
+- All modifier stacking verified
+- Burn immunity to modifiers verified
 
 ## Current Task
-- Ready to implement Damage calculation tests (21 tests)
+- Ready to implement Power and Battle tests
 
 ## Blockers
 - None
 
 ## Next Steps
-1. Implement Damage calculation tests (21 tests: DMG-001 through DMG-021)
-2. Implement Power tests (20 tests: PWR-001 through PWR-020)
-3. Implement full Battle tests (12 tests: BATTLE-001 through BATTLE-012)
+1. Implement Power tests (20 tests: PWR-001 through PWR-020)
+2. Implement full Battle tests (12 tests: BATTLE-001 through BATTLE-012)
 
 ## Notes
-- Greatest Hit Rule implementation verified working perfectly
-- All zone evaluation logic correct
-- Test execution time: 23ms for 47 tests (excellent performance!)
-- Progress: 47/~88 tests (53% complete)
+- Fixed Battle.cs to not apply weaken to additional damage
+- All damage calculation logic verified working correctly
+- Test execution time: 26ms for 68 tests (excellent performance!)
+- Progress: 68/~88 tests (77% complete)
