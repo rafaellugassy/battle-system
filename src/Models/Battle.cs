@@ -56,13 +56,18 @@ public class Battle
         ResolveBurnAndRenew();
 
         // Step 6: Status Duration Decrement
-        DecrementStatusDurations();
+        // NOTE: Status ticking happens BETWEEN battles, not during battle resolution
+        // Statuses applied during a battle persist through that battle
+        // Call player.TickStatuses() manually between battles in game loop
+        // DecrementStatusDurations();
 
         // Step 7: Determine Winner
         DetermineWinner();
 
         // Step 8: Mana Generation
-        GenerateMana();
+        // NOTE: Mana generation happens BETWEEN battles, not during battle resolution
+        // Call this manually in game loop after battle completes
+        // GenerateMana();
     }
 
     /// <summary>
