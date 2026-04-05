@@ -1,6 +1,6 @@
 # Battle System Implementation Progress
 
-## Status: IN PROGRESS - Iteration 2
+## Status: IN PROGRESS - Iteration 3
 
 ## Completed Items
 - ✅ Created C# project structure (src/BattleSystem.csproj)
@@ -14,27 +14,35 @@
 - ✅ Implemented ManaRequirement.cs with RequirementEntry
 - ✅ Implemented Power.cs with mana cost/requirement support
 - ✅ Implemented Card.cs with full validation (zones, powers, ABILITY_DAMAGE limit)
+- ✅ Implemented Player.cs with complete mana management:
+  - AddMana with oldest-first removal when full
+  - CanMeetRequirement for checking mana without spending
+  - TrySpendMana with proper oldest-first spending logic
+  - TakeDamage with elimination check
+  - Heal with MaxHp cap
+  - Status management (add, tick, check)
+  - IsSilenced property
 
 ## Current Task
-- Implementing Player.cs model with mana management methods
+- Starting Battle.cs implementation with 8-step resolution logic
 
 ## Blockers
 - None
 
 ## Next Steps
-1. Complete Player.cs with mana spending/checking logic
-2. Implement Battle.cs resolution logic (8 steps)
-3. Create test project with xUnit
-4. Implement all unit tests from battle-spec.md
-5. Verify all tests pass
+1. Implement Battle.cs with all 8 resolution steps
+2. Implement Greatest Hit Rule logic
+3. Implement damage modifier resolution
+4. Create test project with xUnit
+5. Implement all unit tests from battle-spec.md
+6. Verify all tests pass
 
 ## Test Results
 - No tests run yet (test project not created)
 
 ## Notes
-- All core models implemented with proper validation
-- Card validates exactly 4 zones (one per color)
-- Card validates at least one power and max one ABILITY_DAMAGE
-- Power system supports conditions, effects, mana costs, and requirements
-- Status includes weakness(color) support with color tracking
-- Ready to implement Player with mana management next
+- All core models complete with proper validation
+- Player has full mana management (add, check, spend with oldest-first logic)
+- Player tracks elimination status and prevents actions when eliminated
+- Ready to implement complex Battle resolution logic next
+- Battle.cs will be the most complex class with 8 steps and many edge cases
