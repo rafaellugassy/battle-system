@@ -20,7 +20,19 @@ public class Status
 
     public Status(string type, int duration, int? power = null, int receivedAt = 0, string? weaknessColor = null)
     {
-        if (!ValidTypes.Contains(type))
+        // Extract base type for weakness(color) format
+        var baseType = type;
+        if (type.StartsWith("weakness(") && type.EndsWith(")"))
+        {
+            baseType = "weakness";
+            // Extract color from weakness(color) format if not provided separately
+            if (string.IsNullOrEmpty(weaknessColor))
+            {
+                weaknessColor = type.Substring(9, type.Length - 10); // Extract color between ( and )
+            }
+        }
+
+        if (!ValidTypes.Contains(baseType))
         {
             throw new ArgumentException($"Invalid status type: {type}", nameof(type));
         }
@@ -31,12 +43,12 @@ public class Status
         }
 
         // Validate weakness color if type is weakness
-        if (type == "weakness" && string.IsNullOrEmpty(weaknessColor))
+        if (baseType == "weakness" && string.IsNullOrEmpty(weaknessColor))
         {
             throw new ArgumentException("Weakness status requires a color", nameof(weaknessColor));
         }
 
-        Type = type;
+        Type = type; // Keep full type including weakness(color) format
         Duration = duration;
         Power = power;
         ReceivedAt = receivedAt;

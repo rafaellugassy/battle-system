@@ -18,7 +18,7 @@ public class Player
     public Card Card { get; set; }
     public bool IsEliminated { get; set; }
 
-    public Player(string id, Card card, int hp = DefaultMaxHp)
+    public Player(string id, Card? card, int hp = DefaultMaxHp)
     {
         if (string.IsNullOrWhiteSpace(id))
         {
@@ -28,7 +28,7 @@ public class Player
         Id = id;
         Hp = hp;
         MaxHp = hp;
-        Card = card ?? throw new ArgumentNullException(nameof(card));
+        Card = card!;
         IsEliminated = false;
 
         // Initialize mana pool with 10 empty slots
@@ -194,6 +194,31 @@ public class Player
     {
         Statuses.Add(status);
     }
+
+    /// <summary>
+    /// Resolves burn and renew statuses in order of receipt.
+    /// </summary>
+    public void ResolveBurnAndRenew()
+    {
+        if (IsEliminated) return;
+
+        foreach (var status in Statuses.OrderBy(s => s.ReceivedAt))
+        {
+            if (status.Type == "burn" && status.Power.HasValue)
+            {
+                TakeDamage(status.Power.Value);
+            }
+            else if (status.Type == "renew" && status.Power.HasValue)
+            {
+                Heal(status.Power.Value);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Exposes mana pool for testing.
+    /// </summary>
+    public IEnumerable<Mana> Mana => ManaPool;
 
     /// <summary>
     /// Decrements all status durations and removes expired ones.

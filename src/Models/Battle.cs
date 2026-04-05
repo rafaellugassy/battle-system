@@ -68,7 +68,7 @@ public class Battle
     /// <summary>
     /// Step 1: Determine acting order based on quick/slow statuses.
     /// </summary>
-    private Player[] DetermineActingOrder()
+    public Player[] DetermineActingOrder()
     {
         var p1QuickCount = Player1.GetStatusCount("quick");
         var p1SlowCount = Player1.GetStatusCount("slow");
@@ -207,8 +207,8 @@ public class Battle
         }
 
         // Weakness(color) on defender (x2 per matching weakness)
-        var weaknessStatuses = defender.Statuses.Where(s => 
-            s.Type == "weakness" && 
+        var weaknessStatuses = defender.Statuses.Where(s =>
+            s.Type.StartsWith("weakness(") &&
             s.WeaknessColor == attacker.Card.Color);
         
         foreach (var _ in weaknessStatuses)
