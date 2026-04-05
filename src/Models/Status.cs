@@ -6,10 +6,10 @@ namespace BattleSystem.Models;
 /// </summary>
 public class Status
 {
-    private static readonly HashSet<string> ValidTypes = new() 
-    { 
-        "slow", "quick", "silence", "protect", "weaken", 
-        "vulnerable", "weakness", "burn", "renew" 
+    private static readonly HashSet<string> ValidTypes = new()
+    {
+        "slow", "quick", "silence", "protect", "weaken",
+        "vulnerable", "weakness", "burn", "renew"
     };
 
     public string Type { get; }

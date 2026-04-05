@@ -190,9 +190,11 @@ public class BattleTests
         // Act
         battle.Resolve();
         
-        // Assert - Step 8 is commented out in Battle.cs, so mana should NOT be generated
-        // This test validates that mana generation is disabled for single-battle execution
-        Assert.All(player1.Mana, m => Assert.Equal("empty", m.Color));
+        // Assert - Step 8 generates mana automatically
+        var redMana = player1.Mana.Where(m => m.Color == "red").ToList();
+        Assert.Single(redMana);
+        var blueMana = player2.Mana.Where(m => m.Color == "blue").ToList();
+        Assert.Single(blueMana);
     }
 
     [Fact]
@@ -210,8 +212,10 @@ public class BattleTests
         // Act
         battle.Resolve();
         
-        // Assert - mana pool should remain empty
+        // Assert - colorless card generates no mana, but player2 (blue card) does
         Assert.All(player1.Mana, m => Assert.Equal("empty", m.Color));
+        var blueMana = player2.Mana.Where(m => m.Color == "blue").ToList();
+        Assert.Single(blueMana);
     }
 
     [Fact]
@@ -219,7 +223,7 @@ public class BattleTests
     {
         // Arrange
         // Player1 ON_HIT power: apply burn(power=2, duration=2) to player2
-        var burnStatus = new Status("burn", 2, 2, 100);
+        var burnStatus = new Status("burn", 3, 2, 100);
         var burnPower = new Power(
             "burn",
             new Condition(ConditionType.ON_HIT),
@@ -247,10 +251,10 @@ public class BattleTests
         Assert.Single(player2.Statuses); // has burn status
         Assert.Equal("burn", player2.Statuses[0].Type);
         Assert.Equal(2, player2.Statuses[0].Power);
-        Assert.Equal(2, player2.Statuses[0].Duration); // Step 6 is commented out, duration unchanged
+        Assert.Equal(2, player2.Statuses[0].Duration); // Step 6 decremented from 3 to 2
         
         // Note: Burn DOES tick in step 5 (ResolveBurnAndRenew) during the same battle it's applied
-        // Step 6 (status duration decrement) is disabled - that happens between battles in game loop
+        // Step 6 (status duration decrement) runs at end of battle, so duration 3→2
     }
 
     [Fact]
@@ -258,7 +262,7 @@ public class BattleTests
     {
         // Arrange
         // Player1 has ON_DEFEND power: apply weaken(duration=2) to opponent
-        var weakenStatus = new Status("weaken", 2, null, 100);
+        var weakenStatus = new Status("weaken", 3, null, 100);
         var weakenPower = new Power(
             "weaken",
             new Condition(ConditionType.ON_DEFEND),
@@ -280,7 +284,7 @@ public class BattleTests
         // Assert
         Assert.Single(player2.Statuses); // player2 received weaken
         Assert.Equal("weaken", player2.Statuses[0].Type);
-        Assert.Equal(2, player2.Statuses[0].Duration);
+        Assert.Equal(2, player2.Statuses[0].Duration); // Step 6 decremented from 3 to 2
     }
 
     [Fact]
@@ -303,7 +307,7 @@ public class BattleTests
             new ManaCost(new List<CostEntry> { new CostEntry("blue", 2) }),
             null
         );
-        var vulnerableStatus = new Status("vulnerable", 1, null, 100);
+        var vulnerableStatus = new Status("vulnerable", 2, null, 100);
         var vulnerablePower = new Power(
             "vuln",
             new Condition(ConditionType.ON_HIT),
@@ -333,10 +337,11 @@ public class BattleTests
         // Assert
         Assert.Equal(2, player2.GetStatusCount("vulnerable")); // vulnerable applied twice
         
-        // Verify mana was spent (oldest 2 blue consumed)
+        // Verify mana was spent (oldest 2 blue consumed) + 1 red generated in step 8
         var remainingMana = player1.Mana.Where(m => m.Color != "empty").ToList();
-        Assert.Single(remainingMana); // 3 - 2 = 1
-        Assert.Equal("blue", remainingMana[0].Color);
+        Assert.Equal(2, remainingMana.Count); // 3 - 2 (spent) + 1 (generated) = 2
+        Assert.Equal(1, remainingMana.Count(m => m.Color == "blue")); // 1 blue remains
+        Assert.Equal(1, remainingMana.Count(m => m.Color == "red")); // 1 red generated in step 8
     }
 
     [Fact]
@@ -356,12 +361,11 @@ public class BattleTests
         var battle1 = new Battle(player1, player2, new[] { player1, player2 });
         battle1.Resolve();
         
-        // Assert after battle 1 - Step 6 is commented out, so duration unchanged
+        // Assert after battle 1 - Step 6 decremented duration from 2 to 1
         Assert.Single(player1.Statuses);
-        Assert.Equal(2, player1.Statuses[0].Duration); // unchanged
+        Assert.Equal(1, player1.Statuses[0].Duration); // decremented by step 6
         
-        // Note: In actual game loop, status would tick between battles
-        // This test validates that status ticking is disabled for single-battle execution
+        // Note: Step 6 now runs at end of every battle, decrementing status durations
     }
 
     [Fact]

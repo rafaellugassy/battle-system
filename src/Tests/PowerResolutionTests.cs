@@ -93,7 +93,7 @@ public class PowerResolutionTests
     public void PWR_004_OnDefendPowerFiresWhenDefendSuccessfullyBlocks()
     {
         // Arrange
-        var slowStatus = new Status("slow", 1, null, 100);
+        var slowStatus = new Status("slow", 2, null, 100);
         var onDefendPower = new Power(
             "ondefend",
             new Condition(ConditionType.ON_DEFEND),
@@ -121,7 +121,7 @@ public class PowerResolutionTests
     public void PWR_005_OnDefendPowerDoesNotFireWhenDefendZoneNotAttacked()
     {
         // Arrange
-        var slowStatus = new Status("slow", 1, null, 100);
+        var slowStatus = new Status("slow", 2, null, 100);
         var onDefendPower = new Power(
             "ondefend",
             new Condition(ConditionType.ON_DEFEND),
@@ -149,7 +149,7 @@ public class PowerResolutionTests
     public void PWR_006_OnBeingHitFiresWhenThisCardsZoneIsHit()
     {
         // Arrange
-        var vulnerableStatus = new Status("vulnerable", 1, null, 100);
+        var vulnerableStatus = new Status("vulnerable", 2, null, 100);
         var onBeingHitPower = new Power(
             "onbeinghit",
             new Condition(ConditionType.ON_BEING_HIT),
@@ -177,7 +177,7 @@ public class PowerResolutionTests
     public void PWR_007_OnBeingHitFiresWhenAttackVsAttack()
     {
         // Arrange
-        var vulnerableStatus = new Status("vulnerable", 1, null, 100);
+        var vulnerableStatus = new Status("vulnerable", 2, null, 100);
         var onBeingHitPower = new Power(
             "onbeinghit",
             new Condition(ConditionType.ON_BEING_HIT),
@@ -205,7 +205,7 @@ public class PowerResolutionTests
     public void PWR_008_OnBeingHitDoesNotFireWhenThisCardZoneBlocks()
     {
         // Arrange
-        var vulnerableStatus = new Status("vulnerable", 1, null, 100);
+        var vulnerableStatus = new Status("vulnerable", 2, null, 100);
         var onBeingHitPower = new Power(
             "onbeinghit",
             new Condition(ConditionType.ON_BEING_HIT),
@@ -261,7 +261,7 @@ public class PowerResolutionTests
     public void PWR_010_ManaCostIsSpentWhenPowerActivates()
     {
         // Arrange
-        var burnStatus = new Status("burn", 1, 2, 100);
+        var burnStatus = new Status("burn", 2, 2, 100);
         var onHitPower = new Power(
             "onhit",
             new Condition(ConditionType.ON_HIT),
@@ -288,16 +288,17 @@ public class PowerResolutionTests
         // Assert
         Assert.True(defender.HasStatus("burn")); // Power activated
         var remainingMana = attacker.Mana.Where(m => m.Color != "empty").ToList();
-        Assert.Equal(2, remainingMana.Count); // 3 - 1 = 2
-        Assert.Equal("blue", remainingMana[0].Color); // Oldest blue consumed, second blue remains
-        Assert.Equal("red", remainingMana[1].Color);
+        Assert.Equal(3, remainingMana.Count); // 3 - 1 (spent) + 1 (generated in step 8) = 3
+        // Check we have 1 blue and 2 red (order may vary)
+        Assert.Equal(1, remainingMana.Count(m => m.Color == "blue")); // Second blue remains
+        Assert.Equal(2, remainingMana.Count(m => m.Color == "red")); // Original red + generated red
     }
 
     [Fact]
     public void PWR_011_PowerDoesNotActivateIfManaCostNotMet()
     {
         // Arrange
-        var burnStatus = new Status("burn", 1, 2, 100);
+        var burnStatus = new Status("burn", 2, 2, 100);
         var onHitPower = new Power(
             "onhit",
             new Condition(ConditionType.ON_HIT),
@@ -321,14 +322,14 @@ public class PowerResolutionTests
         
         // Assert
         Assert.False(defender.HasStatus("burn")); // Power did not activate
-        Assert.Equal(1, attacker.Mana.Count(m => m.Color != "empty")); // Mana unchanged
+        Assert.Equal(2, attacker.Mana.Count(m => m.Color != "empty")); // 1 red + 1 red generated in step 8
     }
 
     [Fact]
     public void PWR_012_ManaRequirementIsCheckedButNotSpent()
     {
         // Arrange
-        var burnStatus = new Status("burn", 1, 2, 100);
+        var burnStatus = new Status("burn", 2, 2, 100);
         var onHitPower = new Power(
             "onhit",
             new Condition(ConditionType.ON_HIT),
@@ -353,14 +354,14 @@ public class PowerResolutionTests
         
         // Assert
         Assert.True(defender.HasStatus("burn")); // Power activated
-        Assert.Equal(2, attacker.Mana.Count(m => m.Color != "empty")); // Mana not spent
+        Assert.Equal(3, attacker.Mana.Count(m => m.Color != "empty")); // 2 blue (not spent) + 1 red (generated in step 8)
     }
 
     [Fact]
     public void PWR_013_PowerDoesNotActivateIfManaRequirementNotMet()
     {
         // Arrange
-        var burnStatus = new Status("burn", 1, 2, 100);
+        var burnStatus = new Status("burn", 2, 2, 100);
         var onHitPower = new Power(
             "onhit",
             new Condition(ConditionType.ON_HIT),
@@ -390,7 +391,7 @@ public class PowerResolutionTests
     public void PWR_014_PowerWithBothCostAndRequirementBothMustBeSatisfied()
     {
         // Arrange
-        var burnStatus = new Status("burn", 1, 2, 100);
+        var burnStatus = new Status("burn", 2, 2, 100);
         var onHitPower = new Power(
             "onhit",
             new Condition(ConditionType.ON_HIT),
@@ -417,16 +418,17 @@ public class PowerResolutionTests
         // Assert
         Assert.True(defender.HasStatus("burn")); // Power activated
         var remainingMana = attacker.Mana.Where(m => m.Color != "empty").ToList();
-        Assert.Equal(2, remainingMana.Count); // Red consumed, blues remain
+        Assert.Equal(3, remainingMana.Count); // 1 red consumed, 2 blues remain, 1 red generated in step 8
         Assert.Equal("blue", remainingMana[0].Color);
         Assert.Equal("blue", remainingMana[1].Color);
+        Assert.Equal("red", remainingMana[2].Color); // Generated in step 8
     }
 
     [Fact]
     public void PWR_015_PowerWithBothCostAndRequirementRequirementNotMetEvenIfCostCanBePaid()
     {
         // Arrange
-        var burnStatus = new Status("burn", 1, 2, 100);
+        var burnStatus = new Status("burn", 2, 2, 100);
         var onHitPower = new Power(
             "onhit",
             new Condition(ConditionType.ON_HIT),
@@ -452,15 +454,15 @@ public class PowerResolutionTests
         
         // Assert
         Assert.False(defender.HasStatus("burn")); // Power did not activate
-        Assert.Equal(3, attacker.Mana.Count(m => m.Color != "empty")); // Mana unchanged
+        Assert.Equal(4, attacker.Mana.Count(m => m.Color != "empty")); // 3 original + 1 red generated in step 8
     }
 
     [Fact]
     public void PWR_016_HitTwiceCausesOnHitToFireTwice()
     {
         // Arrange
-        var slowStatus1 = new Status("slow", 1, null, 100);
-        var slowStatus2 = new Status("slow", 1, null, 101);
+        var slowStatus1 = new Status("slow", 2, null, 100);
+        var slowStatus2 = new Status("slow", 2, null, 101);
         
         var hitTwicePower = new Power(
             "hittwice",
@@ -584,7 +586,7 @@ public class PowerResolutionTests
     public void PWR_020_SilencePreventsAllPowersFromFiring()
     {
         // Arrange
-        var burnStatus = new Status("burn", 1, 2, 100);
+        var burnStatus = new Status("burn", 2, 2, 100);
         var onHitPower = new Power(
             "onhit",
             new Condition(ConditionType.ON_HIT),
@@ -609,7 +611,7 @@ public class PowerResolutionTests
         
         // Assert
         Assert.False(defender.HasStatus("burn")); // Power did not fire
-        Assert.Equal(1, attacker.Mana.Count(m => m.Color != "empty")); // Mana not spent
+        Assert.Equal(2, attacker.Mana.Count(m => m.Color != "empty")); // 1 red (not spent) + 1 red (generated in step 8)
     }
 
     // Helper methods

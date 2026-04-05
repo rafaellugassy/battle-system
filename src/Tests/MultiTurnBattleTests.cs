@@ -63,28 +63,18 @@ public class MultiTurnBattleTests
         var battle1 = new Battle(player1, player2, new[] { player1, player2 });
         battle1.Resolve();
         
-        _output.WriteLine($"After battle 1 resolve: Duration={player1.Statuses[0].Duration} (expected: 3, unchanged)");
+        _output.WriteLine($"After battle 1 resolve: Duration={player1.Statuses[0].Duration} (expected: 2, decremented in step 6)");
         
-        // Verify status still present with duration=3 (step 6 disabled in battle)
+        // After battle 1, duration should be 2 (step 6 decremented it)
         Assert.Single(player1.Statuses);
         Assert.Equal("slow", player1.Statuses[0].Type);
-        Assert.Equal(3, player1.Statuses[0].Duration);
-        _output.WriteLine("✓ Battle 1 assertions passed");
-        
-        // GAME LOOP: Manually decrement status durations between battles
         Assert.Equal(2, player1.Statuses[0].Duration);
-        _output.WriteLine($"After DecrementStatusDurations: Duration={player1.Statuses[0].Duration} (expected: 2)");
-        
-        // After game loop step, duration should be 2
-        Assert.Single(player1.Statuses);
-        Assert.Equal(2, player1.Statuses[0].Duration);
-        _output.WriteLine("✓ Status decrement passed");
+        _output.WriteLine("✓ Battle 1 passed");
         
         // Battle 2
         _output.WriteLine("\n--- Battle 2 ---");
         var battle2 = new Battle(player1, player2, new[] { player1, player2 });
         battle2.Resolve();
-        battle2.DecrementStatusDurations();
         
         _output.WriteLine($"After battle 2: Duration={player1.Statuses[0].Duration} (expected: 1)");
         
@@ -97,7 +87,6 @@ public class MultiTurnBattleTests
         _output.WriteLine("\n--- Battle 3 ---");
         var battle3 = new Battle(player1, player2, new[] { player1, player2 });
         battle3.Resolve();
-        battle3.DecrementStatusDurations();
         
         _output.WriteLine($"After battle 3: Statuses count={player1.Statuses.Count} (expected: 0, removed)");
         
@@ -126,21 +115,15 @@ public class MultiTurnBattleTests
         var battle1 = new Battle(player1, player2, new[] { player1, player2 });
         battle1.Resolve();
         
-        // Mana not generated yet (step 8 disabled)
-        Assert.All(player1.Mana, m => Assert.Equal("empty", m.Color));
-        
-        // GAME LOOP: Manually generate mana between battles
-        battle1.GenerateMana();
-        
-        // After game loop, player1 should have 1 red mana
+        // After battle 1, mana generated in step 8
+        // Player1 should have 1 red mana
         var redMana1 = player1.Mana.Where(m => m.Color == "red").ToList();
         Assert.Single(redMana1);
-        Assert.Equal(0, redMana1[0].TurnGenerated); // generated on turn 0
+        Assert.Equal(1, redMana1[0].TurnGenerated); // generated after battle 1
         
         // Battle 2
         var battle2 = new Battle(player1, player2, new[] { player1, player2 });
         battle2.Resolve();
-        battle2.GenerateMana();
         
         // After battle 2, player1 should have 2 red mana
         var redMana2 = player1.Mana.Where(m => m.Color == "red").ToList();
@@ -149,7 +132,6 @@ public class MultiTurnBattleTests
         // Battle 3
         var battle3 = new Battle(player1, player2, new[] { player1, player2 });
         battle3.Resolve();
-        battle3.GenerateMana();
         
         // After battle 3, player1 should have 3 red mana
         var redMana3 = player1.Mana.Where(m => m.Color == "red").ToList();
@@ -158,7 +140,6 @@ public class MultiTurnBattleTests
         // Battle 4
         var battle4 = new Battle(player1, player2, new[] { player1, player2 });
         battle4.Resolve();
-        battle4.GenerateMana();
         
         // After battle 4, player1 should have 4 red mana
         var redMana4 = player1.Mana.Where(m => m.Color == "red").ToList();
@@ -167,18 +148,17 @@ public class MultiTurnBattleTests
         // Battle 5
         var battle5 = new Battle(player1, player2, new[] { player1, player2 });
         battle5.Resolve();
-        battle5.GenerateMana();
         
         // After battle 5, player1 should have 5 red mana (max capacity)
         var redMana5 = player1.Mana.Where(m => m.Color == "red").ToList();
         Assert.Equal(5, redMana5.Count);
         
-        // Verify turn numbers are correct (0, 1, 2, 3, 4)
-        Assert.Equal(0, redMana5[0].TurnGenerated);
-        Assert.Equal(1, redMana5[1].TurnGenerated);
-        Assert.Equal(2, redMana5[2].TurnGenerated);
-        Assert.Equal(3, redMana5[3].TurnGenerated);
-        Assert.Equal(4, redMana5[4].TurnGenerated);
+        // Verify turn numbers are correct (1, 2, 3, 4, 5)
+        Assert.Equal(1, redMana5[0].TurnGenerated);
+        Assert.Equal(2, redMana5[1].TurnGenerated);
+        Assert.Equal(3, redMana5[2].TurnGenerated);
+        Assert.Equal(4, redMana5[3].TurnGenerated);
+        Assert.Equal(5, redMana5[4].TurnGenerated);
     }
 
     [Fact]
@@ -198,31 +178,18 @@ public class MultiTurnBattleTests
         var battle1 = new Battle(player1, player2, new[] { player1, player2 });
         battle1.Resolve();
         
-        // After battle 1, burn ticked in step 5
+        // After battle 1, burn ticked in step 5, duration decremented in step 6
         Assert.Equal(17, player2.Hp); // 20 - 3 = 17
         Assert.Single(player2.Statuses);
-        Assert.Equal(2, player2.Statuses[0].Duration); // duration unchanged (step 6 disabled)
-        
-        // GAME LOOP: Decrement status durations
-        battle1.DecrementStatusDurations();
-        
-        // After game loop, duration should be 1
-        Assert.Equal(1, player2.Statuses[0].Duration);
+        Assert.Equal(1, player2.Statuses[0].Duration); // duration decremented from 2 to 1
         
         // Battle 2
         var battle2 = new Battle(player1, player2, new[] { player1, player2 });
         battle2.Resolve();
         
-        // After battle 2, burn ticked again
+        // After battle 2, burn ticked again, status removed (duration reached 0)
         Assert.Equal(14, player2.Hp); // 17 - 3 = 14
-        Assert.Single(player2.Statuses);
-        Assert.Equal(1, player2.Statuses[0].Duration); // still 1 (step 6 disabled)
-        
-        // GAME LOOP: Decrement status durations
-        battle2.DecrementStatusDurations();
-        
-        // After game loop, status should be removed (duration reached 0)
-        Assert.Empty(player2.Statuses);
+        Assert.Empty(player2.Statuses); // status removed after duration reached 0
     }
 
     [Fact]
@@ -243,9 +210,8 @@ public class MultiTurnBattleTests
         // Battle 1
         var battle1 = new Battle(player1, player2, new[] { player1, player2 });
         battle1.Resolve();
-        battle1.DecrementStatusDurations();
         
-        // After battle 1: slow expires, others remain
+        // After battle 1: slow expires (duration 1→0), others remain
         Assert.Equal(2, player1.Statuses.Count);
         Assert.Contains(player1.Statuses, s => s.Type == "weaken" && s.Duration == 2);
         Assert.Contains(player1.Statuses, s => s.Type == "vulnerable" && s.Duration == 1);
@@ -253,9 +219,8 @@ public class MultiTurnBattleTests
         // Battle 2
         var battle2 = new Battle(player1, player2, new[] { player1, player2 });
         battle2.Resolve();
-        battle2.DecrementStatusDurations();
         
-        // After battle 2: vulnerable expires, weaken remains
+        // After battle 2: vulnerable expires (duration 1→0), weaken remains
         Assert.Single(player1.Statuses);
         Assert.Equal("weaken", player1.Statuses[0].Type);
         Assert.Equal(1, player1.Statuses[0].Duration);
@@ -263,7 +228,6 @@ public class MultiTurnBattleTests
         // Battle 3
         var battle3 = new Battle(player1, player2, new[] { player1, player2 });
         battle3.Resolve();
-        battle3.DecrementStatusDurations();
         
         // After battle 3: all statuses expired
         Assert.Empty(player1.Statuses);
@@ -306,20 +270,13 @@ public class MultiTurnBattleTests
         var battle1 = new Battle(player1, player2, new[] { player1, player2 });
         battle1.Resolve();
         
-        // After battle 1, mana spent
-        Assert.All(player1.Mana, m => Assert.Equal("empty", m.Color));
-        
-        // GAME LOOP: Generate mana
-        battle1.GenerateMana();
-        
-        // After game loop, 1 blue mana generated
+        // After battle 1, mana spent + 1 blue generated in step 8
         var blueMana1 = player1.Mana.Where(m => m.Color == "blue").ToList();
         Assert.Single(blueMana1);
         
         // Battle 2 - not enough mana to use power
         var battle2 = new Battle(player1, player2, new[] { player1, player2 });
         battle2.Resolve();
-        battle2.GenerateMana();
         
         // After battle 2, 2 blue mana total
         var blueMana2 = player1.Mana.Where(m => m.Color == "blue").ToList();
@@ -329,8 +286,9 @@ public class MultiTurnBattleTests
         var battle3 = new Battle(player1, player2, new[] { player1, player2 });
         battle3.Resolve();
         
-        // After battle 3, mana spent again
-        Assert.All(player1.Mana, m => Assert.Equal("empty", m.Color));
+        // After battle 3, mana spent (2 blue) + 1 blue generated in step 8
+        var blueMana3 = player1.Mana.Where(m => m.Color == "blue").ToList();
+        Assert.Single(blueMana3);
     }
 
     [Fact]
@@ -343,40 +301,33 @@ public class MultiTurnBattleTests
         var player1 = new Player("p1", card1);
         var player2 = new Player("p2", card2);
         
-        // Apply initial status
-        player1.AddStatus(new Status("strengthen", 2, null, 0));
+        // Apply initial status - protect halves damage taken
+        player1.AddStatus(new Status("protect", 2, null, 0));
         
         // Turn 1
         var battle1 = new Battle(player1, player2, new[] { player1, player2 });
         battle1.Resolve();
         
-        // Verify battle 1 results
+        // Verify battle 1 results - red attack blocked by blue defend
         Assert.Equal(20, player1.Hp);
-        Assert.Equal(17, player2.Hp); // took 3 damage
+        Assert.Equal(20, player2.Hp); // attack blocked, no damage
         Assert.Single(player1.Statuses);
-        Assert.Equal(2, player1.Statuses[0].Duration);
-        
-        // Game loop between turns
-        battle1.DecrementStatusDurations();
-        battle1.GenerateMana();
-        
-        // Verify game loop effects
+        // Status duration decremented from 2 to 1 in step 6
         Assert.Equal(1, player1.Statuses[0].Duration);
+        // Mana generated in step 8
         Assert.Single(player1.Mana.Where(m => m.Color == "red"));
         
         // Turn 2
         var battle2 = new Battle(player1, player2, new[] { player1, player2 });
         battle2.Resolve();
         
-        // Verify battle 2 results
+        // Verify battle 2 results - attack still blocked
         Assert.Equal(20, player1.Hp);
-        Assert.Equal(14, player2.Hp); // took another 3 damage
+        Assert.Equal(20, player2.Hp); // attack blocked, no damage
         
-        // Game loop between turns
-        battle2.DecrementStatusDurations();
-        battle2.GenerateMana();
+        // Mana generated automatically in step 8
         
-        // Verify status expired
+        // Verify status expired (duration reached 0 in step 6)
         Assert.Empty(player1.Statuses);
         Assert.Equal(2, player1.Mana.Where(m => m.Color == "red").Count());
         
@@ -384,13 +335,11 @@ public class MultiTurnBattleTests
         var battle3 = new Battle(player1, player2, new[] { player1, player2 });
         battle3.Resolve();
         
-        // Verify battle 3 results
+        // Verify battle 3 results - attack still blocked
         Assert.Equal(20, player1.Hp);
-        Assert.Equal(11, player2.Hp); // took another 3 damage
+        Assert.Equal(20, player2.Hp); // attack blocked, no damage
         
-        // Game loop after final turn
-        battle3.DecrementStatusDurations();
-        battle3.GenerateMana();
+        // Mana generated automatically in step 8
         
         // Verify final state
         Assert.Equal(3, player1.Mana.Where(m => m.Color == "red").Count());

@@ -10,6 +10,11 @@ public class Mana
 
     public string Color { get; set; }
     public int ReceivedAt { get; set; }
+    
+    /// <summary>
+    /// Alias for ReceivedAt - represents the turn number when this mana was generated.
+    /// </summary>
+    public int TurnGenerated => ReceivedAt;
 
     public Mana(string color, int receivedAt)
     {
