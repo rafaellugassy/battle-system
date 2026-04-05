@@ -1,54 +1,69 @@
 # Battle System Implementation Progress
 
-## Status: IN PROGRESS - Iteration 10
+## Iteration 11 - Power Resolution Tests (Partial)
 
-## Completed Items
-- ✅ All 12 core models implemented
-- ✅ Complete Battle.cs with all 8 resolution steps
-- ✅ Test project configured and working
-- ✅ Zone tests: 5/5 passing
-- ✅ Mana tests: 11/11 passing
-- ✅ Status tests: 22/22 passing
-- ✅ Greatest Hit tests: 8/8 passing
-- ✅ Damage Calculation tests: 21/21 passing
+### Completed:
+- Created PowerResolutionTests.cs with all 20 test cases (PWR-001 through PWR-020)
+- Tests cover: ON_HIT, ON_DEFEND, ON_BEING_HIT, AFTER_TURN_RESOLVES conditions
+- Tests cover: Mana costs, mana requirements, HIT_TWICE, Silence
+- Fixed ON_DEFEND and ON_BEING_HIT to fire once per condition (not per zone)
+- Added Status cloning in ApplyEffect to avoid object reuse issues
+- Added .ToList() to FirePowersForCondition for safer iteration
 
-## Test Results
-**Total: 68 tests passing (100%)**
+### Test Results: 10/20 Passing (50%)
 
-### Zone Tests (5/5) ✅
-- ZONE-001 through ZONE-005: All passing
+**Passing Tests:**
+- PWR-001: ON_HIT fires on HIT_EMPTY ✅
+- PWR-002: ON_HIT fires on HIT_ATTACK ✅
+- PWR-003: ON_HIT doesn't fire on NO_HIT ✅
+- PWR-005: ON_DEFEND doesn't fire when not attacked ✅
+- PWR-008: ON_BEING_HIT doesn't fire when blocked ✅
+- PWR-009: AFTER_TURN_RESOLVES fires after all zones ✅
+- PWR-013: Power doesn't activate if requirement not met ✅
+- PWR-017: HIT_TWICE both hits halved on HIT_ATTACK ✅
+- PWR-018: HIT_TWICE both hits full on HIT_EMPTY ✅
+- PWR-019: HIT_TWICE second hit resolves even if first eliminates ✅
 
-### Mana Tests (11/11) ✅
-- MANA-001 through MANA-011: All passing
+**Failing Tests (Need Investigation):**
+- PWR-004: ON_DEFEND should fire when defend blocks ❌
+- PWR-006: ON_BEING_HIT should fire when zone is hit ❌
+- PWR-007: ON_BEING_HIT should fire on attack vs attack ❌
+- PWR-010: Mana cost should be spent when power activates ❌
+- PWR-011: Power shouldn't activate if mana cost not met ❌
+- PWR-012: Mana requirement should be checked but not spent ❌
+- PWR-014: Power with both cost and requirement ❌
+- PWR-015: Power shouldn't activate if requirement not met ❌
+- PWR-016: HIT_TWICE should cause ON_HIT to fire twice ❌
+- PWR-020: Silence should prevent all powers ❌
 
-### Status Tests (22/22) ✅
-- STATUS-001 through STATUS-022: All passing
+### Issues Identified:
+1. **ON_DEFEND/ON_BEING_HIT not firing**: Powers with these conditions aren't activating even when conditions are met
+2. **Mana logic issues**: Powers with mana costs/requirements aren't activating correctly
+3. **HIT_TWICE not firing powers twice**: The second ON_HIT power activation isn't happening
+4. **Silence not working**: Powers are still firing when player is silenced
 
-### Greatest Hit Tests (8/8) ✅
-- GHIT-001 through GHIT-008: All passing
+### Next Steps for Iteration 12:
+1. Debug why ON_DEFEND and ON_BEING_HIT powers aren't firing
+2. Debug mana cost/requirement checking in CanActivatePower
+3. Fix HIT_TWICE to properly fire ON_HIT powers twice
+4. Verify Silence status is properly preventing power activation
+5. Add debug logging if needed to trace power activation flow
 
-### Damage Calculation Tests (21/21) ✅
-- DMG-001 through DMG-021: All passing
-- Full/half damage on HIT_EMPTY/HIT_ATTACK verified
-- Weaken/Protect/Vulnerable modifiers verified
-- Ability damage replacement verified
-- Additional damage (no weaken) verified
-- Weakness(color) matching verified
-- All modifier stacking verified
-- Burn immunity to modifiers verified
+## Overall Progress:
+- **Total Tests Implemented**: 88/~88
+- **Total Tests Passing**: 78/~88 (88.6%)
+  - Zone: 5/5 ✅
+  - Mana: 11/11 ✅
+  - Status: 22/22 ✅
+  - Greatest Hit: 8/8 ✅
+  - Damage Calculation: 21/21 ✅
+  - Power Resolution: 10/20 (50%)
+  - Battle: 0/12 (not yet implemented)
 
-## Current Task
-- Ready to implement Power and Battle tests
+## Files Modified This Iteration:
+- src/Tests/PowerResolutionTests.cs (created - 682 lines)
+- src/Models/Battle.cs (modified - fixed ON_DEFEND/ON_BEING_HIT logic, added status cloning)
 
-## Blockers
-- None
-
-## Next Steps
-1. Implement Power tests (20 tests: PWR-001 through PWR-020)
-2. Implement full Battle tests (12 tests: BATTLE-001 through BATTLE-012)
-
-## Notes
-- Fixed Battle.cs to not apply weaken to additional damage
-- All damage calculation logic verified working correctly
-- Test execution time: 26ms for 68 tests (excellent performance!)
-- Progress: 68/~88 tests (77% complete)
+## Git Status:
+- Ready to commit iteration 11 progress
+- 10 power tests passing, 10 failing - need debugging in next iteration

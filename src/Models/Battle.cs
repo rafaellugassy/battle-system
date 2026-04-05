@@ -226,7 +226,7 @@ public class Battle
     {
         if (owner.IsEliminated || owner.IsSilenced) return;
 
-        var powers = owner.Card.Powers.Where(p => p.Condition.Type == conditionType);
+        var powers = owner.Card.Powers.Where(p => p.Condition.Type == conditionType).ToList();
 
         foreach (var power in powers)
         {
@@ -238,12 +238,14 @@ public class Battle
     }
 
     /// <summary>
-    /// Fires ON_DEFEND powers for each defend zone that blocked.
+    /// Fires ON_DEFEND powers if any defend zone blocked.
     /// </summary>
     private void FireOnDefendPowers(Player attacker, Player defender)
     {
         if (defender.IsEliminated || defender.IsSilenced) return;
 
+        // Check if any defend zone blocked an attack
+        var hasDefendBlock = false;
         foreach (var defenderZone in defender.Card.Zones)
         {
             if (defenderZone.State != "defend") continue;
@@ -251,29 +253,44 @@ public class Battle
             var attackerZone = attacker.Card.GetZone(defenderZone.Color);
             if (attackerZone.State == "attack")
             {
-                // This defend zone blocked an attack
-                FirePowersForCondition(defender, attacker, ConditionType.ON_DEFEND);
+                hasDefendBlock = true;
+                break;
             }
+        }
+
+        // Fire ON_DEFEND powers once if any defend blocked
+        if (hasDefendBlock)
+        {
+            FirePowersForCondition(defender, attacker, ConditionType.ON_DEFEND);
         }
     }
 
     /// <summary>
-    /// Fires ON_BEING_HIT powers for each zone that was hit.
+    /// Fires ON_BEING_HIT powers if any zone was hit.
     /// </summary>
     private void FireOnBeingHitPowers(Player attacker, Player defender)
     {
         if (defender.IsEliminated || defender.IsSilenced) return;
 
+        // Check if any zone was hit
+        var wasHit = false;
         foreach (var defenderZone in defender.Card.Zones)
         {
             var attackerZone = attacker.Card.GetZone(defenderZone.Color);
             
             // Zone is hit if it's empty or attack, and opponent zone is attack
-            if ((defenderZone.State == "empty" || defenderZone.State == "attack") && 
+            if ((defenderZone.State == "empty" || defenderZone.State == "attack") &&
                 attackerZone.State == "attack")
             {
-                FirePowersForCondition(defender, attacker, ConditionType.ON_BEING_HIT);
+                wasHit = true;
+                break;
             }
+        }
+
+        // Fire ON_BEING_HIT powers once if any zone was hit
+        if (wasHit)
+        {
+            FirePowersForCondition(defender, attacker, ConditionType.ON_BEING_HIT);
         }
     }
 
@@ -367,7 +384,15 @@ public class Battle
             case EffectType.APPLY_STATUS:
                 if (effect.StatusToApply != null)
                 {
-                    target.AddStatus(effect.StatusToApply);
+                    // Create a new status instance to avoid sharing the same object
+                    var newStatus = new Status(
+                        effect.StatusToApply.Type,
+                        effect.StatusToApply.Duration,
+                        effect.StatusToApply.Power,
+                        effect.StatusToApply.ReceivedAt,
+                        effect.StatusToApply.WeaknessColor
+                    );
+                    target.AddStatus(newStatus);
                 }
                 break;
 
