@@ -1,31 +1,35 @@
 # Battle System Implementation Progress
 
-## Status: NOT STARTED
+## Status: IN PROGRESS - Iteration 1
 
 ## Completed Items
-- None yet
+- ✅ Created C# project structure (src/BattleSystem.csproj)
+- ✅ Created Models directory
+- ✅ Implemented Zone.cs model with validation
+- ✅ Implemented Mana.cs model with age tracking
+- ✅ Implemented Status.cs model with all status types
 
 ## Current Task
-- Awaiting first iteration
+- Implementing Power.cs and related classes (Condition, Effect, ManaCost, ManaRequirement)
 
 ## Blockers
 - None
 
 ## Next Steps
-1. Create C# project structure
-2. Implement Zone.cs model
-3. Implement Mana.cs model
-4. Implement Status.cs model
-5. Implement Card.cs model
-6. Implement Power.cs model
-7. Implement Player.cs model
-8. Implement Battle.cs resolution logic
-9. Implement all unit tests
-10. Verify all tests pass
+1. Implement Power.cs, Condition.cs, Effect.cs, ManaCost.cs, ManaRequirement.cs
+2. Implement Card.cs model
+3. Implement Player.cs model with mana management
+4. Implement Battle.cs resolution logic
+5. Create test project with xUnit
+6. Implement all unit tests from battle-spec.md
+7. Verify all tests pass
 
 ## Test Results
-- No tests run yet
+- No tests run yet (test project not created)
 
 ## Notes
-- Starting fresh implementation
-- Following battle-spec.md and battle-logic.md specifications
+- Using .NET 10.0.201
+- Following C# naming conventions and best practices
+- All models have proper validation
+- Status includes weakness(color) support
+- Mana tracks receivedAt for age-based spending
