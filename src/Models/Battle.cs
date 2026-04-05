@@ -127,8 +127,11 @@ public class Battle
             }
         }
 
-        // Fire ON_DEFEND powers for each successful defend
-        FireOnDefendPowers(attacker, defender);
+        // Fire ON_DEFEND powers only if defend successfully blocked all attacks
+        if (hitResult == HitResult.NO_HIT)
+        {
+            FireOnDefendPowers(attacker, defender);
+        }
 
         // Fire ON_BEING_HIT powers for each zone that was hit
         FireOnBeingHitPowers(attacker, defender);

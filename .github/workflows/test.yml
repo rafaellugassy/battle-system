@@ -1,0 +1,59 @@
+name: Run Tests with Output
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:  # Allows manual trigger from GitHub UI
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+        
+    - name: Restore dependencies
+      run: |
+        cd src
+        dotnet restore
+        
+    - name: Build
+      run: |
+        cd src
+        dotnet build --no-restore
+        
+    - name: Run ALL tests with detailed output
+      run: |
+        cd src
+        dotnet test --no-build --verbosity detailed --logger "console;verbosity=detailed"
+        
+    - name: Run Multi-Turn tests specifically
+      run: |
+        cd src
+        echo "=========================================="
+        echo "MULTI-TURN BATTLE TESTS"
+        echo "=========================================="
+        dotnet test --no-build --filter "FullyQualifiedName~MultiTurnBattleTests" --verbosity detailed --logger "console;verbosity=detailed"
+        
+    - name: Test Summary
+      if: always()
+      run: |
+        echo "=========================================="
+        echo "TEST SUMMARY"
+        echo "=========================================="
+        cd src
+        echo "Total test count:"
+        find Tests -name "*.cs" -exec grep -h "^\s*\[Fact\]" {} \; | wc -l
+        echo ""
+        echo "Test files:"
+        find Tests -name "*Tests.cs" -exec basename {} \; | sort
+
+# Made with Bob
